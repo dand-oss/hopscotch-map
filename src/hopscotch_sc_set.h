@@ -107,81 +107,80 @@ public:
     /*
      * Constructors
      */
-    hopscotch_sc_set() : hopscotch_sc_set(ht::DEFAULT_INIT_BUCKETS_SIZE) {
+    hopscotch_sc_set(): hopscotch_sc_set(ht::DEFAULT_INIT_BUCKETS_SIZE) {
     }
     
     explicit hopscotch_sc_set(size_type bucket_count, 
-                        const Hash& hash = Hash(),
-                        const KeyEqual& equal = KeyEqual(),
-                        const Allocator& alloc = Allocator(),
-                        const Compare& comp = Compare()) : 
-                        m_ht(bucket_count, hash, equal, alloc, ht::DEFAULT_MAX_LOAD_FACTOR, comp)
+                              const Hash& hash = Hash(),
+                              const KeyEqual& equal = KeyEqual(),
+                              const Allocator& alloc = Allocator(),
+                              const Compare& comp = Compare()): 
+                          m_ht(bucket_count, hash, equal, alloc, ht::DEFAULT_MAX_LOAD_FACTOR, comp)
     {
     }
     
     hopscotch_sc_set(size_type bucket_count,
-                  const Allocator& alloc) : hopscotch_sc_set(bucket_count, Hash(), KeyEqual(), alloc)
+                     const Allocator& alloc): hopscotch_sc_set(bucket_count, Hash(), KeyEqual(), alloc)
     {
     }
     
     hopscotch_sc_set(size_type bucket_count,
-                  const Hash& hash,
-                  const Allocator& alloc) : hopscotch_sc_set(bucket_count, hash, KeyEqual(), alloc)
+                     const Hash& hash,
+                     const Allocator& alloc): hopscotch_sc_set(bucket_count, hash, KeyEqual(), alloc)
     {
     }
     
-    explicit hopscotch_sc_set(const Allocator& alloc) : hopscotch_sc_set(ht::DEFAULT_INIT_BUCKETS_SIZE, alloc) {
+    explicit hopscotch_sc_set(const Allocator& alloc): hopscotch_sc_set(ht::DEFAULT_INIT_BUCKETS_SIZE, alloc) {
     }
     
     template<class InputIt>
     hopscotch_sc_set(InputIt first, InputIt last,
-                size_type bucket_count = ht::DEFAULT_INIT_BUCKETS_SIZE,
-                const Hash& hash = Hash(),
-                const KeyEqual& equal = KeyEqual(),
-                const Allocator& alloc = Allocator()) : hopscotch_sc_set(bucket_count, hash, equal, alloc)
+                     size_type bucket_count = ht::DEFAULT_INIT_BUCKETS_SIZE,
+                     const Hash& hash = Hash(),
+                     const KeyEqual& equal = KeyEqual(),
+                     const Allocator& alloc = Allocator()): hopscotch_sc_set(bucket_count, hash, equal, alloc)
     {
         insert(first, last);
     }
     
     template<class InputIt>
     hopscotch_sc_set(InputIt first, InputIt last,
-                size_type bucket_count,
-                const Allocator& alloc) : hopscotch_sc_set(first, last, bucket_count, Hash(), KeyEqual(), alloc)
+                     size_type bucket_count,
+                     const Allocator& alloc): hopscotch_sc_set(first, last, bucket_count, Hash(), KeyEqual(), alloc)
     {
     }
     
     template<class InputIt>
     hopscotch_sc_set(InputIt first, InputIt last,
-                size_type bucket_count,
-                const Hash& hash,
-                const Allocator& alloc) : hopscotch_sc_set(first, last, bucket_count, hash, KeyEqual(), alloc)
+                     size_type bucket_count,
+                     const Hash& hash,
+                     const Allocator& alloc): hopscotch_sc_set(first, last, bucket_count, hash, KeyEqual(), alloc)
     {
     }
 
     hopscotch_sc_set(std::initializer_list<value_type> init,
-                    size_type bucket_count = ht::DEFAULT_INIT_BUCKETS_SIZE,
-                    const Hash& hash = Hash(),
-                    const KeyEqual& equal = KeyEqual(),
-                    const Allocator& alloc = Allocator()) : 
-                    hopscotch_sc_set(init.begin(), init.end(), bucket_count, hash, equal, alloc)
+                     size_type bucket_count = ht::DEFAULT_INIT_BUCKETS_SIZE,
+                     const Hash& hash = Hash(),
+                     const KeyEqual& equal = KeyEqual(),
+                     const Allocator& alloc = Allocator()): 
+                 hopscotch_sc_set(init.begin(), init.end(), bucket_count, hash, equal, alloc)
     {
     }
 
     hopscotch_sc_set(std::initializer_list<value_type> init,
-                    size_type bucket_count,
-                    const Allocator& alloc) : 
-                    hopscotch_sc_set(init.begin(), init.end(), bucket_count, Hash(), KeyEqual(), alloc)
+                     size_type bucket_count,
+                     const Allocator& alloc): 
+                 hopscotch_sc_set(init.begin(), init.end(), bucket_count, Hash(), KeyEqual(), alloc)
     {
     }
 
     hopscotch_sc_set(std::initializer_list<value_type> init,
-                    size_type bucket_count,
-                    const Hash& hash,
-                    const Allocator& alloc) : 
-                    hopscotch_sc_set(init.begin(), init.end(), bucket_count, hash, KeyEqual(), alloc)
+                     size_type bucket_count,
+                     const Hash& hash,
+                     const Allocator& alloc): 
+                 hopscotch_sc_set(init.begin(), init.end(), bucket_count, hash, KeyEqual(), alloc)
     {
     }
-
     
     hopscotch_sc_set& operator=(std::initializer_list<value_type> ilist) {
         m_ht.clear();
@@ -489,7 +488,7 @@ public:
             return false;
         }
         
-        for(const auto& element_lhs : lhs) {
+        for(const auto& element_lhs: lhs) {
             const auto it_element_rhs = rhs.find(element_lhs);
             if(it_element_rhs == rhs.cend()) {
                 return false;

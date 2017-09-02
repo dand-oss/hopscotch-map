@@ -121,84 +121,84 @@ public:
     using const_iterator = typename ht::const_iterator;
     
     
+public:    
     /*
      * Constructors
      */
-    hopscotch_sc_map() : hopscotch_sc_map(ht::DEFAULT_INIT_BUCKETS_SIZE) {
+    hopscotch_sc_map(): hopscotch_sc_map(ht::DEFAULT_INIT_BUCKETS_SIZE) {
     }
     
     explicit hopscotch_sc_map(size_type bucket_count, 
-                        const Hash& hash = Hash(),
-                        const KeyEqual& equal = KeyEqual(),
-                        const Allocator& alloc = Allocator(),
-                        const Compare& comp = Compare()) : 
-                        m_ht(bucket_count, hash, equal, alloc, ht::DEFAULT_MAX_LOAD_FACTOR, comp)
+                              const Hash& hash = Hash(),
+                              const KeyEqual& equal = KeyEqual(),
+                              const Allocator& alloc = Allocator(),
+                              const Compare& comp = Compare()): 
+                          m_ht(bucket_count, hash, equal, alloc, ht::DEFAULT_MAX_LOAD_FACTOR, comp)
     {
     }
     
     hopscotch_sc_map(size_type bucket_count,
-                  const Allocator& alloc) : hopscotch_sc_map(bucket_count, Hash(), KeyEqual(), alloc)
+                     const Allocator& alloc): hopscotch_sc_map(bucket_count, Hash(), KeyEqual(), alloc)
     {
     }
     
     hopscotch_sc_map(size_type bucket_count,
-                  const Hash& hash,
-                  const Allocator& alloc) : hopscotch_sc_map(bucket_count, hash, KeyEqual(), alloc)
+                     const Hash& hash,
+                     const Allocator& alloc): hopscotch_sc_map(bucket_count, hash, KeyEqual(), alloc)
     {
     }
     
-    explicit hopscotch_sc_map(const Allocator& alloc) : hopscotch_sc_map(ht::DEFAULT_INIT_BUCKETS_SIZE, alloc) {
+    explicit hopscotch_sc_map(const Allocator& alloc): hopscotch_sc_map(ht::DEFAULT_INIT_BUCKETS_SIZE, alloc) {
     }
     
     template<class InputIt>
     hopscotch_sc_map(InputIt first, InputIt last,
-                size_type bucket_count = ht::DEFAULT_INIT_BUCKETS_SIZE,
-                const Hash& hash = Hash(),
-                const KeyEqual& equal = KeyEqual(),
-                const Allocator& alloc = Allocator()) : hopscotch_sc_map(bucket_count, hash, equal, alloc)
+                     size_type bucket_count = ht::DEFAULT_INIT_BUCKETS_SIZE,
+                     const Hash& hash = Hash(),
+                     const KeyEqual& equal = KeyEqual(),
+                     const Allocator& alloc = Allocator()): hopscotch_sc_map(bucket_count, hash, equal, alloc)
     {
         insert(first, last);
     }
     
     template<class InputIt>
     hopscotch_sc_map(InputIt first, InputIt last,
-                size_type bucket_count,
-                const Allocator& alloc) : hopscotch_sc_map(first, last, bucket_count, Hash(), KeyEqual(), alloc)
+                     size_type bucket_count,
+                     const Allocator& alloc): hopscotch_sc_map(first, last, bucket_count, Hash(), KeyEqual(), alloc)
     {
     }
     
     template<class InputIt>
     hopscotch_sc_map(InputIt first, InputIt last,
-                size_type bucket_count,
-                const Hash& hash,
-                const Allocator& alloc) : hopscotch_sc_map(first, last, bucket_count, hash, KeyEqual(), alloc)
+                     size_type bucket_count,
+                     const Hash& hash,
+                     const Allocator& alloc): hopscotch_sc_map(first, last, bucket_count, hash, KeyEqual(), alloc)
     {
     }
 
     hopscotch_sc_map(std::initializer_list<value_type> init,
-                    size_type bucket_count = ht::DEFAULT_INIT_BUCKETS_SIZE,
-                    const Hash& hash = Hash(),
-                    const KeyEqual& equal = KeyEqual(),
-                    const Allocator& alloc = Allocator()) : 
-                    hopscotch_sc_map(init.begin(), init.end(), bucket_count, hash, equal, alloc)
+                     size_type bucket_count = ht::DEFAULT_INIT_BUCKETS_SIZE,
+                     const Hash& hash = Hash(),
+                     const KeyEqual& equal = KeyEqual(),
+                     const Allocator& alloc = Allocator()): 
+                 hopscotch_sc_map(init.begin(), init.end(), bucket_count, hash, equal, alloc)
     {
     }
 
     hopscotch_sc_map(std::initializer_list<value_type> init,
-                    size_type bucket_count,
-                    const Allocator& alloc) : 
-                    hopscotch_sc_map(init.begin(), init.end(), bucket_count, Hash(), KeyEqual(), alloc)
+                     size_type bucket_count,
+                     const Allocator& alloc): 
+                 hopscotch_sc_map(init.begin(), init.end(), bucket_count, Hash(), KeyEqual(), alloc)
     {
     }
 
     hopscotch_sc_map(std::initializer_list<value_type> init,
-                    size_type bucket_count,
-                    const Hash& hash,
-                    const Allocator& alloc) : 
-                    hopscotch_sc_map(init.begin(), init.end(), bucket_count, hash, KeyEqual(), alloc)
+                     size_type bucket_count,
+                     const Hash& hash,
+                     const Allocator& alloc): 
+                 hopscotch_sc_map(init.begin(), init.end(), bucket_count, hash, KeyEqual(), alloc)
     {
     }
-
     
     hopscotch_sc_map& operator=(std::initializer_list<value_type> ilist) {
         m_ht.clear();
@@ -245,7 +245,7 @@ public:
         
     template<class P, typename std::enable_if<std::is_constructible<value_type, P&&>::value>::type* = nullptr>
     std::pair<iterator, bool> insert(P&& value) { 
-        return m_ht.insert(std::forward<P>(value)); 
+        return m_ht.emplace(std::forward<P>(value)); 
     }
     
     std::pair<iterator, bool> insert(value_type&& value) { 
@@ -259,7 +259,7 @@ public:
         
     template<class P, typename std::enable_if<std::is_constructible<value_type, P&&>::value>::type* = nullptr>
     iterator insert(const_iterator hint, P&& value) { 
-        return m_ht.insert(hint, std::forward<P>(value));
+        return m_ht.emplace_hint(hint, std::forward<P>(value));
     }
     
     iterator insert(const_iterator hint, value_type&& value) { 
@@ -632,7 +632,7 @@ public:
             return false;
         }
         
-        for(const auto& element_lhs : lhs) {
+        for(const auto& element_lhs: lhs) {
             const auto it_element_rhs = rhs.find(element_lhs.first);
             if(it_element_rhs == rhs.cend() || element_lhs.second != it_element_rhs->second) {
                 return false;

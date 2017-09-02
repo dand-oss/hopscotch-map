@@ -90,20 +90,20 @@ bool operator!=(const custom_allocator<T>&, const custom_allocator<U>&) {
 BOOST_AUTO_TEST_SUITE(test_custom_allocator)
 
 BOOST_AUTO_TEST_CASE(test_custom_allocator_1) {
-        nb_custom_allocs = 0;
-        
-        tsl::hopscotch_map<int, int, mod_hash<9>, std::equal_to<int>, 
-                           custom_allocator<std::pair<int, int>>, 6> map;
-        
-        const int nb_elements = 10000;
-        for(int i = 0; i < nb_elements; i++) {
-            map.insert({i, i*2});
-        }
-        
-        BOOST_CHECK_NE(map.overflow_size(), 0);
-        BOOST_CHECK_NE(nb_custom_allocs, 0);
-        
-        //TODO check that number of global allocations is 0
+    nb_custom_allocs = 0;
+    
+    tsl::hopscotch_map<int, int, mod_hash<9>, std::equal_to<int>, 
+                        custom_allocator<std::pair<int, int>>, 6> map;
+    
+    const int nb_elements = 10000;
+    for(int i = 0; i < nb_elements; i++) {
+        map.insert({i, i*2});
+    }
+    
+    BOOST_CHECK_NE(map.overflow_size(), 0);
+    BOOST_CHECK_NE(nb_custom_allocs, 0);
+    
+    //TODO check that number of global allocations is 0
 }
 
 BOOST_AUTO_TEST_SUITE_END()
