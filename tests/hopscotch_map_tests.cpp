@@ -291,6 +291,23 @@ BOOST_AUTO_TEST_CASE_TEMPLATE(test_erase_all, HMap, test_types) {
 }
 
 
+BOOST_AUTO_TEST_CASE(test_range_erase) {
+    // insert x values, delete all except 10 first and 10 last value
+    using HMap = tsl::hopscotch_map<std::string, std::int64_t>;
+    
+    const std::size_t nb_values = 1000;
+    HMap map = utils::get_filled_hash_map<HMap>(nb_values);
+    
+    auto it_first = std::next(map.begin(), 10);
+    auto it_last = std::next(map.begin(), 990);
+    
+    auto it = map.erase(it_first, it_last);
+    BOOST_CHECK(it == it_last);
+    BOOST_CHECK_EQUAL(map.size(), 20);
+    BOOST_CHECK_EQUAL(std::distance(map.begin(), map.end()), 20);
+}
+
+
 BOOST_AUTO_TEST_CASE_TEMPLATE(test_erase_loop, HMap, test_types) {
     // insert x values, delete all one by one
     size_t nb_values = 1000;
