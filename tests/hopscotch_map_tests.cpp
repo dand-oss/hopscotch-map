@@ -15,10 +15,9 @@
 #include <utility>
 #include <vector>
 
-
+#include <tsl/hopscotch_map.h>
+#include <tsl/hopscotch_sc_map.h>
 #include "utils.h"
-#include "hopscotch_map.h"
-#include "hopscotch_sc_map.h"
 
 
 BOOST_AUTO_TEST_SUITE(test_hopscotch_map)

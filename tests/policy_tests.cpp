@@ -6,7 +6,7 @@
 #include <limits>
 #include <stdexcept>
 
-#include "hopscotch_hash.h"
+#include <tsl/hopscotch_hash.h>
 
 
 BOOST_AUTO_TEST_SUITE(test_policy)

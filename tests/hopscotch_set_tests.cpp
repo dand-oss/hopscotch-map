@@ -5,9 +5,9 @@
 #include <cstdint>
 #include <utility>
 
+#include <tsl/hopscotch_set.h>
+#include <tsl/hopscotch_sc_set.h>
 #include "utils.h"
-#include "hopscotch_set.h"
-#include "hopscotch_sc_set.h"
 
 
 BOOST_AUTO_TEST_SUITE(test_hopscotch_set)
