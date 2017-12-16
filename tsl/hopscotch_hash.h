@@ -1309,13 +1309,13 @@ public:
         m_min_load_factor_rehash_threshold = size_type(float(bucket_count())*MIN_LOAD_FACTOR_FOR_REHASH);
     }
     
-    void rehash(size_type count) {
-        count = std::max(count, size_type(std::ceil(float(size())/max_load_factor())));
-        rehash_impl(count);
+    void rehash(size_type count_) {
+        count_ = std::max(count_, size_type(std::ceil(float(size())/max_load_factor())));
+        rehash_impl(count_);
     }
     
-    void reserve(size_type count) {
-        rehash(size_type(std::ceil(float(count)/max_load_factor())));
+    void reserve(size_type count_) {
+        rehash(size_type(std::ceil(float(count_)/max_load_factor())));
     }
     
     
@@ -1379,8 +1379,8 @@ private:
     
     template<typename U = value_type, 
              typename std::enable_if<std::is_nothrow_move_constructible<U>::value>::type* = nullptr>
-    void rehash_impl(size_type count) {
-        hopscotch_hash new_map = new_hopscotch_hash(count);
+    void rehash_impl(size_type count_) {
+        hopscotch_hash new_map = new_hopscotch_hash(count_);
         
         if(!m_overflow_elements.empty()) {
             new_map.m_overflow_elements.swap(m_overflow_elements);
@@ -1440,8 +1440,8 @@ private:
     template<typename U = value_type, 
              typename std::enable_if<std::is_copy_constructible<U>::value && 
                                      !std::is_nothrow_move_constructible<U>::value>::type* = nullptr>
-    void rehash_impl(size_type count) {
-        hopscotch_hash new_map = new_hopscotch_hash(count);
+    void rehash_impl(size_type count_) {
+        hopscotch_hash new_map = new_hopscotch_hash(count_);
                 
         const bool use_stored_hash = USE_STORED_HASH_ON_REHASH(new_map.bucket_count());
         for(const hopscotch_bucket& bucket: m_buckets) {
