@@ -1,6 +1,6 @@
 [![Build Status](https://travis-ci.org/Tessil/hopscotch-map.svg?branch=master)](https://travis-ci.org/Tessil/hopscotch-map) [![Build status](https://ci.appveyor.com/api/projects/status/e97rjkcn3qwrhpvf/branch/master?svg=true)](https://ci.appveyor.com/project/Tessil/hopscotch-map/branch/master)
 
-## A C++ implementation of a fast hash map using hopscotch hashing
+## A C++ implementation of a fast hash map and hash set using hopscotch hashing
 
 The hopscotch-map library is a C++ implementation of a fast hash map and hash set using open-addressing and hopscotch hashing to resolve collisions. It is a cache-friendly data structure offering better performances than `std::unordered_map` in most cases and is closely similar to `google::dense_hash_map` while using less memory and providing more functionalities.
 
