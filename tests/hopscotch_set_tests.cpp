@@ -29,7 +29,7 @@
 #include <utility>
 
 #include <tsl/hopscotch_set.h>
-#include <tsl/hopscotch_sc_set.h>
+#include <tsl/bhopscotch_set.h>
 #include "utils.h"
 
 
@@ -38,9 +38,9 @@ BOOST_AUTO_TEST_SUITE(test_hopscotch_set)
 using test_types = boost::mpl::list<tsl::hopscotch_set<int64_t, mod_hash<9>>,
                                     tsl::hopscotch_set<self_reference_member_test, mod_hash<9>>,
                                     tsl::hopscotch_set<move_only_test, mod_hash<9>>,
-                                    tsl::hopscotch_sc_set<int64_t, mod_hash<9>>,
-                                    tsl::hopscotch_sc_set<self_reference_member_test, mod_hash<9>>,
-                                    tsl::hopscotch_sc_set<move_only_test, mod_hash<9>>>;
+                                    tsl::bhopscotch_set<int64_t, mod_hash<9>>,
+                                    tsl::bhopscotch_set<self_reference_member_test, mod_hash<9>>,
+                                    tsl::bhopscotch_set<move_only_test, mod_hash<9>>>;
                                     
                               
                                     
