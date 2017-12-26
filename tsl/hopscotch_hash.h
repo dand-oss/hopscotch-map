@@ -111,7 +111,7 @@ struct is_power_of_two_policy<tsl::hh::power_of_two_growth_policy<GrowthFactor>>
 /*
  * smallest_type_for_min_bits::type returns the smallest type that can fit MinBits.
  */
-static const size_t SMALLEST_TYPE_MAX_BITS_SUPPORTED = 64;
+static const std::size_t SMALLEST_TYPE_MAX_BITS_SUPPORTED = 64;
 template<unsigned int MinBits, typename Enable = void>
 class smallest_type_for_min_bits {
 };
@@ -149,18 +149,24 @@ public:
  * - An unsigned integer of type neighborhood_bitmap used to tell us which buckets in the neighborhood of the 
  *   current bucket contain a value with a hash belonging to the current bucket. 
  * 
- * For a bucket 'b' a bit 'i' (counting from 0 and from the least significant bit to the most significant) 
- * set to 1 means that the bucket 'b+i' contains a value with a hash belonging to bucket 'b'.
- * The bits used for that, start from the third least significant bit.
- * 
- * The least significant bit is set to 1 if there is a value in the bucket storage.
- * The second least significant bit is set to 1 if there is an overflow. More than NeighborhoodSize values 
+ * For a bucket 'bct', a bit 'i' (counting from 0 and from the least significant bit to the most significant) 
+ * set to 1 means that the bucket 'bct + i' contains a value with a hash belonging to bucket 'bct'.
+ * The bits used for that, start from the third least significant bit. 
+ * The two least significant bits are reserved:
+ * - The least significant bit is set to 1 if there is a value in the bucket storage.
+ * - The second least significant bit is set to 1 if there is an overflow. More than NeighborhoodSize values 
  * give the same hash, all overflow values are stored in the m_overflow_elements list of the map.
+ * 
+ * Details regarding hopscotch hashing an its implementation can be found here: 
+ *  https://tessil.github.io/2016/08/29/hopscotch-hashing.html
  */
 static const std::size_t NB_RESERVED_BITS_IN_NEIGHBORHOOD = 2; 
 
 using truncated_hash_type = std::uint_least32_t;
 
+/**
+ * Store a truncated hash if StoreHash is true, otherwise don't store anything.
+ */
 template<bool StoreHash>
 class hopscotch_bucket_hash {
 public:
@@ -209,20 +215,20 @@ private:
 template<typename ValueType, unsigned int NeighborhoodSize, bool StoreHash>
 class hopscotch_bucket: public hopscotch_bucket_hash<StoreHash> {
 private:
-    static const size_t MIN_NEIGHBORHOOD_SIZE = 4;
-    static const size_t MAX_NEIGHBORHOOD_SIZE = SMALLEST_TYPE_MAX_BITS_SUPPORTED - NB_RESERVED_BITS_IN_NEIGHBORHOOD; 
+    static const std::size_t MIN_NEIGHBORHOOD_SIZE = 4;
+    static const std::size_t MAX_NEIGHBORHOOD_SIZE = SMALLEST_TYPE_MAX_BITS_SUPPORTED - NB_RESERVED_BITS_IN_NEIGHBORHOOD; 
     
     
-    static_assert(NeighborhoodSize >= 4, "NeighborhoodSize should be >= 4.");
+    static_assert(NeighborhoodSize >= MIN_NEIGHBORHOOD_SIZE, "NeighborhoodSize should be >= 4.");
     // We can't put a variable in the message, ensure coherence
     static_assert(MIN_NEIGHBORHOOD_SIZE == 4, ""); 
     
-    static_assert(NeighborhoodSize <= 62, "NeighborhoodSize should be <= 62.");
+    static_assert(NeighborhoodSize <= MAX_NEIGHBORHOOD_SIZE, "NeighborhoodSize should be <= 62.");
     // We can't put a variable in the message, ensure coherence
     static_assert(MAX_NEIGHBORHOOD_SIZE == 62, ""); 
     
     
-    static_assert(!StoreHash || NeighborhoodSize <= 30, 
+    static_assert(!StoreHash || NeighborhoodSize <= MAX_NEIGHBORHOOD_SIZE - 32, 
                   "NeighborhoodSize should be <= 30 if StoreHash is true.");
     // We can't put a variable in the message, ensure coherence
     static_assert(MAX_NEIGHBORHOOD_SIZE - 32 == 30, "");
@@ -382,14 +388,8 @@ private:
     }
     
     void destroy_value() noexcept {
-        try {
-            tsl_assert(!empty());
-            
-            value().~value_type();
-        }
-        catch(...) {
-            std::terminate();
-        }
+        tsl_assert(!empty());
+        value().~value_type();
     }
     
 private:
@@ -401,14 +401,14 @@ private:
 
 
 /**
- * Internal common class used by hopscotch_(sc)_map and hopscotch_(sc)_set.
+ * Internal common class used by (b)hopscotch_map and (b)hopscotch_set.
  * 
- * ValueType is what will be stored by hopscotch_hash (usually std::pair<Key, T> for map and Key for set).
+ * ValueType is what will be stored by hopscotch_hash (usually std::pair<Key, T> for a map and Key for a set).
  * 
  * KeySelect should be a FunctionObject which takes a ValueType in parameter and returns a reference to the key.
  * 
  * ValueSelect should be a FunctionObject which takes a ValueType in parameter and returns a reference to the value.
- * ValueSelect should be void if there is no value (in set for example).
+ * ValueSelect should be void if there is no value (in a set for example).
  * 
  * OverflowContainer will be used as containers for overflown elements. Usually it should be a list<ValueType>
  * or a set<Key>/map<Key, T>.
@@ -450,8 +450,8 @@ private:
     /**
      * We can only use the hash on rehash if the size of the hash type is the same as the stored one or
      * if we use a power of two modulo. In the case of the power of two modulo, we just mask
-     * the least significant bytes, we just have to check that the truncated_hash_type didn't truncated
-     * more bytes.
+     * the least significant bits, we just have to check that the truncated_hash_type didn't truncated
+     * more bits.
      */
     static bool USE_STORED_HASH_ON_REHASH(size_type bucket_count) {
         (void) bucket_count;
@@ -491,11 +491,11 @@ private:
     
 public:    
     /**
-     * The 'operator*()' and 'operator->()' methods return a const reference and const pointer respectively to the 
+     * The `operator*()` and `operator->()` methods return a const reference and const pointer respectively to the 
      * stored value type.
      * 
-     * In case of a map, to get a mutable reference to the value associated to a key (the '.second' in the 
-     * stored pair), you have to call 'value()'.
+     * In case of a map, to get a mutable reference to the value associated to a key (the `.second` in the 
+     * stored pair), you have to call `value()`.
      */
     template<bool is_const>
     class hopscotch_iterator {
@@ -861,7 +861,10 @@ public:
     }
     
     
-    
+    /**
+     * Here to avoid `template<class K> size_type erase(const K& key)` being used when
+     * we use an iterator instead of a const_iterator.
+     */
     iterator erase(iterator pos) {
         return erase(const_iterator(pos));
     }
@@ -1059,7 +1062,8 @@ public:
         /*
          * So that the last bucket can have NeighborhoodSize neighbors, the size of the bucket array is a little
          * bigger than the real number of buckets. We could use some of the buckets at the beginning, but
-         * it is easier this way and we avoid weird behaviour with iterators.
+         * it is easier this way (we don't need to do bound checks for wrapping around) and we avoid weird 
+         * behaviour with iterators.
          */
         return m_buckets.size() - NeighborhoodSize + 1; 
     }
@@ -1073,6 +1077,7 @@ public:
      * Hash policy 
      */
     float load_factor() const {
+        tsl_assert(bucket_count() > 0);
         return float(m_nb_elements)/float(bucket_count());
     }
     
@@ -1112,14 +1117,11 @@ public:
      */
     iterator mutable_iterator(const_iterator pos) {
         if(pos.m_buckets_iterator != pos.m_buckets_end_iterator) {
-            // Get a non-const iterator
             auto it = m_buckets.begin() + std::distance(m_buckets.cbegin(), pos.m_buckets_iterator);
             return iterator(it, m_buckets.end(), m_overflow_elements.begin());
         }
         else {
-            // Get a non-const iterator
             auto it = mutable_overflow_iterator(pos.m_overflow_iterator);
-            
             return iterator(m_buckets.end(), m_buckets.end(), it);
         }
     }
@@ -1253,7 +1255,6 @@ private:
     }
 #endif    
 
-    // iterator is in overflow list
     iterator_overflow erase_from_overflow(const_iterator_overflow pos, std::size_t ibucket_for_hash) {
 #ifdef TSL_NO_RANGE_ERASE_WITH_CONST_ITERATOR        
         auto it_next = m_overflow_elements.erase(mutable_overflow_iterator(pos));
@@ -1276,7 +1277,6 @@ private:
         return it_next;
     }
     
-    // iterator is in bucket
     void erase_from_bucket(iterator_buckets pos, std::size_t ibucket_for_hash) noexcept {
         const std::size_t ibucket_for_pos = std::distance(m_buckets.begin(), pos);
         tsl_assert(ibucket_for_pos >= ibucket_for_hash);
@@ -1319,6 +1319,8 @@ private:
                 if(ibucket_empty - ibucket_for_hash < NeighborhoodSize) {
                     auto it = insert_in_bucket(ibucket_empty, ibucket_for_hash, 
                                                hash, std::forward<Args>(value_type_args)...);
+                    m_nb_elements++;
+                    
                     return std::make_pair(iterator(it, m_buckets.end(), m_overflow_elements.begin()), true);
                 }
             }
@@ -1337,8 +1339,8 @@ private:
         }
     
         rehash(GrowthPolicy::next_bucket_count());
-        
         ibucket_for_hash = bucket_for_hash(hash);
+        
         return insert_value(ibucket_for_hash, hash, std::forward<Args>(value_type_args)...);
     }    
     
@@ -1397,7 +1399,6 @@ private:
         
         tsl_assert(!m_buckets[ibucket_for_hash].empty());
         m_buckets[ibucket_for_hash].toggle_neighbor_presence(ibucket_empty - ibucket_for_hash);
-        m_nb_elements++;
         
         return m_buckets.begin() + ibucket_empty;
     }
