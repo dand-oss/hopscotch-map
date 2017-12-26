@@ -14,10 +14,10 @@ add_executable("${TEST_EXECUTABLE}" "tests/main.cpp"
                                     "tests/policy_tests.cpp")
                                     
 target_include_directories("${TEST_EXECUTABLE}" PRIVATE "${Boost_INCLUDE_DIRS}" ".") 
-target_link_libraries("${TEST_EXECUTABLE}" ${Boost_LIBRARIES})
+target_link_libraries("${TEST_EXECUTABLE}" asan ubsan ${Boost_LIBRARIES})
 
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang" OR CMAKE_CXX_COMPILER_ID MATCHES "GNU")
-    target_compile_options("${TEST_EXECUTABLE}" PRIVATE -std=c++11 -Werror -Wall -Wextra -Wold-style-cast -O3 -DTSL_DEBUG)
+    target_compile_options("${TEST_EXECUTABLE}" PRIVATE -std=c++11 -fsanitize=address,undefined -Werror -Wall -Wextra -Wold-style-cast -O3 -DTSL_DEBUG)
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "MSVC")
     target_compile_options("${TEST_EXECUTABLE}" PRIVATE /bigobj /WX /W3 /DTSL_DEBUG)
 endif()
