@@ -660,6 +660,21 @@ private:
     ht m_ht;
 };
 
+
+/**
+ * Same as `tsl::hopscotch_map` but where default `GrowthPolicy` is `tsl::hh::prime_growth_policy`.
+ */
+template<class Key, 
+         class T, 
+         class Hash = std::hash<Key>,
+         class KeyEqual = std::equal_to<Key>,
+         class Allocator = std::allocator<std::pair<Key, T>>,
+         unsigned int NeighborhoodSize = 62,
+         bool StoreHash = false,
+         class GrowthPolicy = tsl::hh::prime_growth_policy>
+using hopscotch_pg_map = hopscotch_map<Key, T, Hash, KeyEqual, Allocator, 
+                                       NeighborhoodSize, StoreHash, GrowthPolicy>;
+
 } // end namespace tsl
 
 #endif

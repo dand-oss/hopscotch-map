@@ -509,7 +509,21 @@ public:
 private:
     ht m_ht;    
 };
-  
+
+
+/**
+ * Same as `tsl::bhopscotch_set` but where default `GrowthPolicy` is `tsl::hh::prime_growth_policy`.
+ */
+template<class Key, 
+         class Hash = std::hash<Key>,
+         class KeyEqual = std::equal_to<Key>,
+         class Compare = std::less<Key>,
+         class Allocator = std::allocator<Key>,
+         unsigned int NeighborhoodSize = 62,
+         bool StoreHash = false,
+         class GrowthPolicy = tsl::hh::prime_growth_policy>
+using bhopscotch_pg_set = bhopscotch_set<Key, Hash, KeyEqual, Compare, Allocator, 
+                                         NeighborhoodSize, StoreHash, GrowthPolicy>;
 
 } // end namespace tsl
 
