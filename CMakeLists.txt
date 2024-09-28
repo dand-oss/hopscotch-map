@@ -4,6 +4,13 @@ include(GNUInstallDirs)
 
 project(tsl-hopscotch-map VERSION 2.4.0)
 
+###############
+# ASI default settings
+list(APPEND CMAKE_MODULE_PATH "$ENV{ASV_CMAKE}")
+include(asv_cmake_defaults)
+asv_cmake_defaults( )
+###############
+
 add_library(hopscotch_map INTERFACE)
 # Use tsl::hopscotch_map as target, more consistent with other libraries conventions (Boost, Qt, ...)
 add_library(tsl::hopscotch_map ALIAS hopscotch_map)
